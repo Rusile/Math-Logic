@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "bison/gen/Expression.tab.h"
 #include "bison/gen/Expression.lexer.h"
 #include <stdio.h>
 #include <string.h>

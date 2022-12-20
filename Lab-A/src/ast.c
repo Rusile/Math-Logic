@@ -1,6 +1,6 @@
 #include "ast.h"
 #include <stdlib.h>
-#include "string.h"
+#include <string.h>
 
 struct ast *make_binop(enum binop_type type, struct ast *left, struct ast *right) {
     struct ast *res = malloc(sizeof(struct ast));

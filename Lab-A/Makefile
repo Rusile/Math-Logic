@@ -3,7 +3,7 @@ CXX=gcc
 GR_DIR=src/bison
 BISON_GEN_DIR=$(GR_DIR)/gen
 
-all: ../build
+all: ./build
 	$(CXX) $(CXXFLAGS) \
 		-o build/app \
 		src/main.c \
@@ -27,7 +27,7 @@ build/app: src/main.c src $(BISON_GEN_DIR)/Expression.lexer.c $(BISON_GEN_DIR)/E
 
 bison-codegen: $(BISON_GEN_DIR)/Expression.lexer.c $(BISON_GEN_DIR)/Expression.tab.c
 
-compile: ../build build/app
+compile: ./build build/app
 
 run:
 	./build/app
