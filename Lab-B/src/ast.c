@@ -1,8 +1,8 @@
 #include "ast.h"
 #include <stdlib.h>
-#include <string.h>
+#include "string.h"
 
-// functions for parsing expression
+//functions for parsing
 
 struct ast *make_binop(enum binop_type type, struct ast *left, struct ast *right) {
     struct ast *res = malloc(sizeof(struct ast));
@@ -22,6 +22,7 @@ struct ast *make_unop(enum unop_type type, struct ast *child) {
 }
 
 struct ast *make_var(char *name) {
+
     struct ast *res = malloc(sizeof(struct ast));
     res->type = AST_VAR;
     size_t name_size = strlen(name);
@@ -29,6 +30,25 @@ struct ast *make_var(char *name) {
     memcpy(name_copy, name, name_size + 1);
     res->as_var.name = name_copy;
     return res;
+}
+
+
+static int64_t str_hash(char *str) {
+    int64_t hash = 12;
+    int c;
+
+    while (c = *str++)
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
+}
+
+void add_var_to_vector(struct vector** vc, struct ast *ast_var) {
+    if (*vc == 0) *vc = create(16);
+    
+    if (find_first_index_by_value(*vc,str_hash( ast_var->as_var.name)) == -1) {
+        add_back(*vc, str_hash(ast_var->as_var.name));
+    }
 }
 
 // functions for converting expression to string
@@ -100,4 +120,48 @@ void ast_to_string(struct ast *ast, char *buf) {
     size_t size = _ast_to_string(ast, buf);
     buf[size] = '\0';
 }
+
+// functions for checking truthiness of expression
+
+static bool execute_binop_expression(struct ast_binop *binop, int64_t mask, struct vector* vc) {
+    switch (binop->type) {
+        case BINOP_AND:
+            return execute_ast_expression(binop->left, mask, vc) & execute_ast_expression(binop->right, mask, vc);
+        case BINOP_IMP:
+            return !execute_ast_expression(binop->left, mask, vc) | execute_ast_expression(binop->right, mask, vc);
+        case BINOP_OR:
+            return execute_ast_expression(binop->left, mask, vc) | execute_ast_expression(binop->right, mask, vc);
+    }
+}
+
+static bool execute_unop_expression(struct ast_unop *unop, int64_t mask, struct vector* vc) {
+    switch (unop->type) {
+        case UNOP_NEG:
+            return !execute_ast_expression(unop->subtree, mask, vc);
+    }
+}
+
+static bool parse_var(struct ast_name* var, int64_t mask, struct vector* vc) {
+    int64_t value = find_first_index_by_value(vc, str_hash(var->name));
+    int64_t res = mask & (1 <<  value);
+
+    return res;
+}
+
+bool execute_ast_expression(struct ast *ast, int64_t mask, struct vector* vc) {
+
+    switch (ast->type) {
+        case AST_BINOP:
+            return execute_binop_expression(&(ast->as_binop), mask, vc);
+        case AST_UNOP:
+            return execute_unop_expression(&(ast->as_unop), mask, vc);
+        case AST_VAR:
+
+            return parse_var(&(ast->as_var), mask, vc);
+    }
+}
+
+
+
+
 
