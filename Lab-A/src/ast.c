@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+// functions for parsing expression
+
 struct ast *make_binop(enum binop_type type, struct ast *left, struct ast *right) {
     struct ast *res = malloc(sizeof(struct ast));
     res->type = AST_BINOP;
@@ -28,6 +30,8 @@ struct ast *make_var(char *name) {
     res->as_var.name = name_copy;
     return res;
 }
+
+// functions for converting expression to string
 
 static size_t _ast_to_string(struct ast *ast, char *buf);
 

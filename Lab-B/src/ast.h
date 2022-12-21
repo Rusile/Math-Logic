@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "vector.h"
 #include <inttypes.h>
+#include <stdbool.h>
 
 struct ast {
     enum {
@@ -38,8 +39,8 @@ struct ast* make_unop(enum unop_type type, struct ast* child);
 struct ast* make_var(char* name);
 void ast_to_string(struct ast* ast, char* buf);
 void add_var_to_vector(struct vector** vc, struct ast *ast_var);
-int64_t execute_ast_expression(struct ast *ast, int64_t mask, struct vector* table);
-int64_t str_hash(char *str);
+bool execute_ast_expression(struct ast *ast, int64_t mask, struct vector* table);
+
 
 
 #endif

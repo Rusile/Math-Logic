@@ -47,10 +47,9 @@ int main() {
 
     int64_t true_count = 0;
     int64_t false_count = 0;
-    int64_t max = 1 << get_count(vc);
+    int64_t max_mask_value = 1 << get_count(vc);
 
-
-    for (int64_t i = 0; i < max; i++) {
+    for (int64_t i = 0; i < max_mask_value; i++) {
 
         int64_t res = execute_ast_expression(result, i, vc);
 
