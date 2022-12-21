@@ -1,12 +1,12 @@
 %{
 #include "ast.h"
-#include "hash_map.h"
+#include "vector.h"
 
 int yylex(void);
 void yyerror(const char *);
 
 struct ast* result = 0;
-HashTable* map = 0;
+struct vector* vc = 0;
 %}
 
 %union {
@@ -38,7 +38,7 @@ Expression: Expression IMP Expression { $$ = make_binop(BINOP_IMP, $1, $3); }
           | NEG Expression            { $$ = make_unop(UNOP_NEG, $2);       }
           | LEFT Expression RIGHT     { $$ = $2;                            }
           | NAME                      { $$ = make_var($1);
-          				          add_var_to_map(&map, $$);  		    }
+          				          add_var_to_vector(&vc, $$);  		    }
           ;
 
 %%

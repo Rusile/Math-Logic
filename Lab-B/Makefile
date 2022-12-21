@@ -7,7 +7,7 @@ all: ./build
 	$(CXX) $(CXXFLAGS) \
 		-o build/app \
 		src/main.c \
-		src/hash_map.c \
+		src/vector.c \
 		src/ast.c \
 		src/bison/gen/Expression.lexer.c \
 		src/bison/gen/Expression.tab.c

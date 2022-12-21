@@ -30,12 +30,22 @@ struct ast *make_var(char *name) {
     return res;
 }
 
-void add_var_to_map(HashTable** table, struct ast *ast_var) {
-    if (*table == 0) *table = create_table(16);
+void add_var_to_vector(struct vector** vc, struct ast *ast_var) {
+    if (*vc == 0) *vc = create(16);
     
-    if (ht_search_int(*table, ast_var->as_var.name) == -1) {
-        ht_insert_int(*table, ast_var->as_var.name, (*table)->count);
+    if (find_first_index_by_value(*vc,str_hash( ast_var->as_var.name)) == -1) {
+        add_back(*vc, str_hash(ast_var->as_var.name));
     }
+}
+
+int64_t str_hash(char *str) {
+    int64_t hash = 12;
+    int c;
+
+    while (c = *str++)
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
 }
 
 static size_t _ast_to_string(struct ast *ast, char *buf);
@@ -107,39 +117,39 @@ void ast_to_string(struct ast *ast, char *buf) {
 }
 
 
-static int64_t execute_binop_expression(struct ast_binop *binop, int64_t mask, HashTable* table) {
+static int64_t execute_binop_expression(struct ast_binop *binop, int64_t mask, struct vector* vc) {
     switch (binop->type) {
         case BINOP_AND:
-            return execute_ast_expression(binop->left, mask, table) && execute_ast_expression(binop->right, mask, table);
+            return execute_ast_expression(binop->left, mask, vc) && execute_ast_expression(binop->right, mask, vc);
         case BINOP_IMP:
-            return ~execute_ast_expression(binop->left, mask, table) || execute_ast_expression(binop->right, mask, table);
+            return ~execute_ast_expression(binop->left, mask, vc) || execute_ast_expression(binop->right, mask, vc);
         case BINOP_OR:
-            return execute_ast_expression(binop->left, mask, table) || execute_ast_expression(binop->right, mask, table);
+            return execute_ast_expression(binop->left, mask, vc) || execute_ast_expression(binop->right, mask, vc);
     }
 }
 
-static int64_t execute_unop_expression(struct ast_unop *unop, int64_t mask, HashTable* table) {
+static int64_t execute_unop_expression(struct ast_unop *unop, int64_t mask, struct vector* vc) {
     switch (unop->type) {
         case UNOP_NEG:
-            return !execute_ast_expression(unop->subtree, mask, table);
+            return !execute_ast_expression(unop->subtree, mask, vc);
     }
 }
 
-static int64_t parse_var(struct ast_name* var, int64_t mask, HashTable* table) {
-    int64_t value = ht_search_int(table, var->name);
+static int64_t parse_var(struct ast_name* var, int64_t mask, struct vector* vc) {
+    int64_t value = find_first_index_by_value(vc, str_hash(var->name));
     int64_t res = mask & (1 <<  value);
     return res;
 }
 
-int64_t execute_ast_expression(struct ast *ast, int64_t mask, HashTable* table) {
+int64_t execute_ast_expression(struct ast *ast, int64_t mask, struct vector* vc) {
 
     switch (ast->type) {
         case AST_BINOP:
-            return execute_binop_expression(&(ast->as_binop), mask, table);
+            return execute_binop_expression(&(ast->as_binop), mask, vc);
         case AST_UNOP:
-            return execute_unop_expression(&(ast->as_unop), mask, table);
+            return execute_unop_expression(&(ast->as_unop), mask, vc);
         case AST_VAR:
-            return parse_var(&(ast->as_var), mask, table);
+            return parse_var(&(ast->as_var), mask, vc);
     }
 }
 

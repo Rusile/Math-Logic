@@ -1,5 +1,5 @@
 #include "ast.h"
-#include "hash_map.h"
+#include "vector.h"
 #include "bison/gen/Expression.lexer.h"
 #include <stdio.h>
 #include <string.h>
@@ -10,7 +10,7 @@
 #define MEM_SIZE 102400000
 
 extern struct ast* result;
-extern HashTable* map;
+extern struct vector* vc;
 
 void yyerror(const char *error) {
     fprintf(stderr, "Error: %s", error);
@@ -44,15 +44,15 @@ int main() {
     yy_scan_string(input);
     yyparse();
 
-    
+
     int64_t true_count = 0;
     int64_t false_count = 0;
-    int64_t max = 1 << map->count;
-  
+    int64_t max = 1 << get_count(vc);
+
 
     for (int64_t i = 0; i < max; i++) {
-      
-        int64_t res = execute_ast_expression(result, i, map);
+
+        int64_t res = execute_ast_expression(result, i, vc);
 
         if (res) {
             true_count++;
@@ -64,11 +64,11 @@ int main() {
     if (true_count == 0) {
         printf("Unsatisfiable");
     } else if (false_count == 0) {
-        printf("Valid"); 
+        printf("Valid");
     } else {
         printf("Satisfiable and invalid, %d true and %d false cases", true_count, false_count);
     }
-    
+
     return 0;
 }
 

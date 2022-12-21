@@ -1,6 +1,6 @@
 %{
 #include "ast.h"
-#include "hash_map.h"
+#include "vector.h"
 #include "bison/gen/Expression.tab.h"
 %}
 

@@ -2,7 +2,8 @@
 #define MATH_LOG_1_EXPRESSION_H
 
 #include <stdio.h>
-#include "hash_map.h"
+#include "vector.h"
+#include <inttypes.h>
 
 struct ast {
     enum {
@@ -36,7 +37,9 @@ struct ast* make_binop(enum binop_type type, struct ast* left, struct ast* right
 struct ast* make_unop(enum unop_type type, struct ast* child); 
 struct ast* make_var(char* name);
 void ast_to_string(struct ast* ast, char* buf);
-void add_var_to_map(HashTable** table, struct ast *ast_var);
-int64_t execute_ast_expression(struct ast *ast, int64_t mask, HashTable* table);
+void add_var_to_vector(struct vector** vc, struct ast *ast_var);
+int64_t execute_ast_expression(struct ast *ast, int64_t mask, struct vector* table);
+int64_t str_hash(char *str);
+
 
 #endif
