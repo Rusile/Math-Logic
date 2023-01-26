@@ -1,0 +1,211 @@
+Терминалы не используются в грамматике
+
+    END
+
+
+Грамматика
+
+    0 $accept: Input $end
+
+    1 Input: Expression
+
+    2 Expression: Expression IMP Expression
+    3           | Expression OR Expression
+    4           | Expression AND Expression
+    5           | NEG Expression
+    6           | LEFT Expression RIGHT
+    7           | NAME
+
+
+Терминальные символы с правилами, в которых они появляются
+
+    $end (0) 0
+    error (256)
+    NAME <name> (258) 7
+    IMP (259) 2
+    OR (260) 3
+    AND (261) 4
+    NEG (262) 5
+    LEFT (263) 6
+    RIGHT (264) 6
+    END (265)
+
+
+Нетерминальные символы с правилами, в которых они появляются
+
+    $accept (11)
+        on left: 0
+    Input <e> (12)
+        on left: 1
+        on right: 0
+    Expression <e> (13)
+        on left: 2 3 4 5 6 7
+        on right: 1 2 3 4 5 6
+
+
+Состояние 0
+
+    0 $accept: • Input $end
+
+    NAME  сдвиг, и переход в состояние 1
+    NEG   сдвиг, и переход в состояние 2
+    LEFT  сдвиг, и переход в состояние 3
+
+    Input       переход в состояние 4
+    Expression  переход в состояние 5
+
+
+Состояние 1
+
+    7 Expression: NAME •
+
+    $default  вывод с использованием правила 7 (Expression)
+
+
+Состояние 2
+
+    5 Expression: NEG • Expression
+
+    NAME  сдвиг, и переход в состояние 1
+    NEG   сдвиг, и переход в состояние 2
+    LEFT  сдвиг, и переход в состояние 3
+
+    Expression  переход в состояние 6
+
+
+Состояние 3
+
+    6 Expression: LEFT • Expression RIGHT
+
+    NAME  сдвиг, и переход в состояние 1
+    NEG   сдвиг, и переход в состояние 2
+    LEFT  сдвиг, и переход в состояние 3
+
+    Expression  переход в состояние 7
+
+
+Состояние 4
+
+    0 $accept: Input • $end
+
+    $end  сдвиг, и переход в состояние 8
+
+
+Состояние 5
+
+    1 Input: Expression •
+    2 Expression: Expression • IMP Expression
+    3           | Expression • OR Expression
+    4           | Expression • AND Expression
+
+    IMP  сдвиг, и переход в состояние 9
+    OR   сдвиг, и переход в состояние 10
+    AND  сдвиг, и переход в состояние 11
+
+    $default  вывод с использованием правила 1 (Input)
+
+
+Состояние 6
+
+    2 Expression: Expression • IMP Expression
+    3           | Expression • OR Expression
+    4           | Expression • AND Expression
+    5           | NEG Expression •
+
+    $default  вывод с использованием правила 5 (Expression)
+
+
+Состояние 7
+
+    2 Expression: Expression • IMP Expression
+    3           | Expression • OR Expression
+    4           | Expression • AND Expression
+    6           | LEFT Expression • RIGHT
+
+    IMP    сдвиг, и переход в состояние 9
+    OR     сдвиг, и переход в состояние 10
+    AND    сдвиг, и переход в состояние 11
+    RIGHT  сдвиг, и переход в состояние 12
+
+
+Состояние 8
+
+    0 $accept: Input $end •
+
+    $default  принять
+
+
+Состояние 9
+
+    2 Expression: Expression IMP • Expression
+
+    NAME  сдвиг, и переход в состояние 1
+    NEG   сдвиг, и переход в состояние 2
+    LEFT  сдвиг, и переход в состояние 3
+
+    Expression  переход в состояние 13
+
+
+Состояние 10
+
+    3 Expression: Expression OR • Expression
+
+    NAME  сдвиг, и переход в состояние 1
+    NEG   сдвиг, и переход в состояние 2
+    LEFT  сдвиг, и переход в состояние 3
+
+    Expression  переход в состояние 14
+
+
+Состояние 11
+
+    4 Expression: Expression AND • Expression
+
+    NAME  сдвиг, и переход в состояние 1
+    NEG   сдвиг, и переход в состояние 2
+    LEFT  сдвиг, и переход в состояние 3
+
+    Expression  переход в состояние 15
+
+
+Состояние 12
+
+    6 Expression: LEFT Expression RIGHT •
+
+    $default  вывод с использованием правила 6 (Expression)
+
+
+Состояние 13
+
+    2 Expression: Expression • IMP Expression
+    2           | Expression IMP Expression •
+    3           | Expression • OR Expression
+    4           | Expression • AND Expression
+
+    IMP  сдвиг, и переход в состояние 9
+    OR   сдвиг, и переход в состояние 10
+    AND  сдвиг, и переход в состояние 11
+
+    $default  вывод с использованием правила 2 (Expression)
+
+
+Состояние 14
+
+    2 Expression: Expression • IMP Expression
+    3           | Expression • OR Expression
+    3           | Expression OR Expression •
+    4           | Expression • AND Expression
+
+    AND  сдвиг, и переход в состояние 11
+
+    $default  вывод с использованием правила 3 (Expression)
+
+
+Состояние 15
+
+    2 Expression: Expression • IMP Expression
+    3           | Expression • OR Expression
+    4           | Expression • AND Expression
+    4           | Expression AND Expression •
+
+    $default  вывод с использованием правила 4 (Expression)

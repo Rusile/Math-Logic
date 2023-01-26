@@ -2,15 +2,12 @@ CXXFLAGS=-std=c11 -Wall -I src
 CXX=gcc
 GR_DIR=src/bison
 BISON_GEN_DIR=$(GR_DIR)/gen
+SRCS=$(call rwildcard,src,*.c)
 
 all: ./build
 	$(CXX) $(CXXFLAGS) \
 		-o build/app \
-		src/main.c \
-		src/vector.c \
-		src/ast.c \
-		src/bison/gen/Expression.lexer.c \
-		src/bison/gen/Expression.tab.c
+		$(SRCS)
 
 $(BISON_GEN_DIR)/%.lexer.c $(BISON_GEN_DIR)/%.lexer.h: $(GR_DIR)/%.lex $(BISON_GEN_DIR)
 	flex $(GR_DIR)/$*.lex
@@ -23,7 +20,7 @@ $(BISON_GEN_DIR)/%.tab.c $(BISON_GEN_DIR)/%.tab.h: $(GR_DIR)/%.y $(BISON_GEN_DIR
 $(BISON_GEN_DIR):
 	mkdir -p src/bison/gen
 
-build/app: src/main.c src $(BISON_GEN_DIR)/Expression.lexer.c $(BISON_GEN_DIR)/Expression.tab.c
+build/app: src/main.c $(BISON_GEN_DIR)/Expression.lexer.c $(BISON_GEN_DIR)/Expression.tab.c
 	$(CXX) $(CXXFLAGS) -o build/app $^
 
 bison-codegen: $(BISON_GEN_DIR)/Expression.lexer.c $(BISON_GEN_DIR)/Expression.tab.c

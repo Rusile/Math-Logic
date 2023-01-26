@@ -1,6 +1,5 @@
 %{
 #include "ast.h"
-#include "vector.h"
 #include "bison/gen/Expression.tab.h"
 %}
 

@@ -1,16 +1,13 @@
-#include "ast.h"
-#include "vector.h"
-#include "bison/gen/Expression.lexer.h"
-#include "bison/gen/Expression.tab.h"
-#include "parse.c"
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
+#include "parser.h"
+#include "ast.h"
 
 #define OK       0
 #define NO_INPUT 1
 #define TOO_LONG 2
 #define MEM_SIZE 102400000
-
 
 static int getLine (char *buff, size_t sz) {
     int ch, extra;
@@ -30,18 +27,10 @@ static int getLine (char *buff, size_t sz) {
 }
 
 int main() {
-    char* input = malloc(MEM_SIZE);
-    getLine(input, MEM_SIZE); // get str from stdin
-
-    struct ast** assumptions = malloc(sizeof(struct ast*) * 5);
-    int num_assumptions;
-    struct ast* res;
-    parse_header(input, assumptions, &num_assumptions, &res);
-    printf("%d", num_assumptions);
-
-    int64_t max_mask_value = 1 << get_count(vc);
-
+    char* buffer = malloc(MEM_SIZE);
+    getLine(buffer, MEM_SIZE); // get str from stdin
+    struct ast* ast = ast_parse(buffer);
+    ast_to_string(ast, buffer);
+    printf("%s", buffer);
     return 0;
 }
-
-
