@@ -2,6 +2,7 @@
 #include "vector.h"
 #include "bison/gen/Expression.lexer.h"
 #include "bison/gen/Expression.tab.h"
+#include "parse.c"
 #include <stdio.h>
 #include <string.h>
 
@@ -10,16 +11,6 @@
 #define TOO_LONG 2
 #define MEM_SIZE 102400000
 
-extern struct ast* result;
-extern struct vector* vc;
-
-void yyerror(const char *error) {
-    fprintf(stderr, "Error: %s", error);
-}
-
-int yywrap() {
-    return 1;
-}
 
 static int getLine (char *buff, size_t sz) {
     int ch, extra;
@@ -42,8 +33,11 @@ int main() {
     char* input = malloc(MEM_SIZE);
     getLine(input, MEM_SIZE); // get str from stdin
 
-    yy_scan_string(input);
-    yyparse();
+    struct ast** assumptions = malloc(sizeof(struct ast*) * 5);
+    int num_assumptions;
+    struct ast* res;
+    parse_header(input, assumptions, &num_assumptions, &res);
+    printf("%d", num_assumptions);
 
     int64_t max_mask_value = 1 << get_count(vc);
 
