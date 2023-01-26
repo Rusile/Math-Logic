@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <ctype.h>
 #include "parser.h"
 #include "ast.h"
 
@@ -15,6 +16,8 @@ void create_axioms(ast **axioms);
 bool is_axiom(ast* node, ast** table, ast** axioms);
 
 void clear_memory(ast** table);
+
+bool is_blank(char* str);
 
 static int getLine(char *buff, size_t sz) {
     int ch, extra;
@@ -50,7 +53,7 @@ int main() {
     getLine(buffer, MEM_SIZE); // get str from stdin
     struct ast *ast = ast_parse(buffer);
 
-    printf("%d", ast_equals(axiom_1, ast));
+    printf("%d", is_axiom(ast, memory, axioms));
 
     memory[0] = NULL;
     memory[1] = NULL;
@@ -94,6 +97,7 @@ void create_axioms(ast **axioms) {
 
 bool is_axiom(ast* node, ast** table, ast** axioms) {
     for (size_t i = 0; i < AXIOMS_COUNT; i++) {
+
         clear_memory(table);
         if (ast_equals(node, axioms[i])) {
             return true;
@@ -106,4 +110,13 @@ void clear_memory(ast** table) {
     table[0] = NULL;
     table[1] = NULL;
     table[2] = NULL;
+}
+
+bool is_blank(char* str) {
+    for (size_t i = 0; i < strlen(str); i++) {
+        if (!isspace(str[i])) {
+            return false;
+        }
+    }
+    return true;
 }
