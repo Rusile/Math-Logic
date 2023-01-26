@@ -1,7 +1,6 @@
 #include "ast.h"
 #include <stdlib.h>
 #include <string.h>
-// functions for parsing expression
 
 struct ast *make_binop(enum binop_type type, struct ast *left, struct ast *right) {
     struct ast *res = malloc(sizeof(struct ast));
@@ -102,36 +101,66 @@ void ast_to_string(struct ast *ast, char *buf) {
 
 bool ast_equals(ast *left, ast *right);
 
-bool ast_binop_equals(ast* left, ast* right) {
-    if (left->as_binop.type != right->as_binop.type) {
+static bool ast_binop_equals(struct ast_binop* left, ast* right) {
+    if (left->type != right->as_binop.type) {
         return false;
     }
 
-    return ast_equals(left->as_binop.left, right->as_binop.left)
-        && ast_equals(left->as_binop.right, right->as_binop.right);
+    return ast_equals(left->left, right->as_binop.left)
+        && ast_equals(left->right, right->as_binop.right);
 }
 
-bool ast_unop_equals(ast* left, ast* right) {
-    if (left->as_unop.type != right->as_unop.type) {
+static bool ast_unop_equals(struct ast_unop* left, ast* right) {
+    if (left->type != right->as_unop.type) {
         return false;
     }
-
-    return ast_equals(left->as_unop.subtree, right->as_unop.subtree);
+    return ast_equals(left->subtree, right->as_unop.subtree);
 }
 
-bool ast_var_equals(ast* left, ast* right) {
-    return strcmp(left->as_var.name, right->as_var.name);
+static bool ast_var_equals(struct ast_name* left, ast* right) {
+    return strcmp(left->name, right->as_var.name) == 0;
+}
+
+static bool ast_place_equals(struct ast_place* left, ast* right) {
+    if (*left->value == NULL) {
+        *left->value = right;
+        return true;
+    }
+    return ast_equals(*left->value, right);
 }
 
 bool ast_equals(ast *left, ast *right) {
     switch (left->type) {
         case AST_BINOP:
-            return ast_binop_equals(left, right);
+            return ast_binop_equals(&left->as_binop, right);
         case AST_UNOP:
-            return ast_unop_equals(left, right);
+            return ast_unop_equals(&left->as_unop, right);
         case AST_VAR:
-            return ast_var_equals(left, right);
+            return ast_var_equals(&left->as_var, right);
+        case AST_PLACE:
+            return ast_place_equals(&left->as_place, right);
     }
 }
 
+struct ast* impl(struct ast* left, struct ast* right) {
+    return make_binop(BINOP_IMP, left, right);
+}
 
+struct ast* conj(struct ast* left, struct ast* right) {
+    return make_binop(BINOP_AND, left, right);
+}
+
+struct ast* disj(struct ast* left, struct ast* right) {
+    return make_binop(BINOP_OR, left, right);
+}
+
+struct ast* neg(struct ast* tree) {
+    return make_unop(UNOP_NEG, tree);
+}
+
+struct ast* place(struct ast** value) {
+    struct ast* result = malloc(sizeof(ast));
+    result->type = AST_PLACE;
+    result->as_place.value = value;
+    return result;
+}
